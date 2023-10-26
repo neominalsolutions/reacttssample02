@@ -12,28 +12,49 @@ export interface Post {
   title:string;
   body:string;
   id:number;
+  user?: PostUser;
 }
+
+export interface PostUser {
+  name:string;
+  email:string;
+  username:string;
+}
+
+// Not Function Componente çalışırken timing işlemlerinde dikkatli olalım.
 
 function PostsPage() {
 
   const [posts,setPosts] = useState<Post[]>([]);
-
+  const controller = new AbortController();
+  // uygulama gereksiz kaynak tüketmesin diye timing işlemlerini clean up function içinde sonlandıralım
+  let interval:any;
   // birden falza case durumda bu load datayı çağırabiliriz.
   const loadData = async()=> {
     // response AxiosResponse döndürür.
-    let response = await axios.get('https://jsonplaceholder.typicode.com/posts');
+    // controller abort işlemini axios ile nasıl uygularız ? 
+    let response = await axios.get('https://jsonplaceholder.typicode.com/posts',{signal:controller.signal});
     let data = response.data; // response.body() denk gelir. fetch api da gördük
     setPosts([...data]);
   }
 
+    
    useEffect(() => { // ComponentDidMount denk gelir.
     console.log('component doma giriğinde');
     // useEffect hook içerisinde async bir function kullanmak için aşağıdaki yazım formatını kullanalım.
-    loadData();
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    interval = setInterval(() => {
+      console.log('interval');
+    },1000);
+
+    loadData();
     // clean up function diyoruz. Component domdan ayrılırken çalışır.
     return () => { // Component WillUnMount
-      console.log('component domdan çıktığında')
+      // network request terminate işlemi
+      controller.abort(); // sinyal kesme işlemini yaptık
+      console.log('component domdan çıktığında');
+      clearInterval(interval);
     }
   }, []) // [] hali empty dependecy herhangi bir state mekanizmasını takip etmediğimiz kısım. sadece doma girerken 1 kereye mahsus çalışır
 
