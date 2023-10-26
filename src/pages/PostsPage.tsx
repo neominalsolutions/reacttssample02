@@ -3,6 +3,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
+import { PostApiService } from '../services/PostApiService';
 
 // Backend deki Dto yapıları için burada karşılık olarak interface tercih edilir.
 // type mapping yaptığımızdan dolayı class ihtiyaç duymuyoruz.
@@ -27,18 +28,32 @@ function PostsPage() {
 
   const [posts,setPosts] = useState<Post[]>([]);
   const controller = new AbortController();
+  const postApiService = new PostApiService('posts', controller.signal);
   // uygulama gereksiz kaynak tüketmesin diye timing işlemlerini clean up function içinde sonlandıralım
   let interval:any;
   // birden falza case durumda bu load datayı çağırabiliriz.
   const loadData = async()=> {
     // response AxiosResponse döndürür.
     // controller abort işlemini axios ile nasıl uygularız ? 
-    let response = await axios.get('https://jsonplaceholder.typicode.com/posts',{signal:controller.signal});
-    let data = response.data; // response.body() denk gelir. fetch api da gördük
-    setPosts([...data]);
+    // let response = await axios.get('https://jsonplaceholder.typicode.com/posts',{signal:controller.signal});
+    // let data = response.data; // response.body() denk gelir. fetch api da gördük
+    // const data = await postApiService.getPosts();
+    // setPosts([...data]);
+
+    // postApiService.getPosts().then(response => {
+    // }).catch(err => {})
+
+    postApiService.getPostsPromise()
+    .then((response:any) => {
+      console.log('response', response.data);
+      // verinin yüklendiğine emin olduğumuz yerde setState yaptık.
+      setPosts([...response.data])
+    }).catch(err => {
+      console.log('err', err);
+    });
   }
 
-    
+
    useEffect(() => { // ComponentDidMount denk gelir.
     console.log('component doma giriğinde');
     // useEffect hook içerisinde async bir function kullanmak için aşağıdaki yazım formatını kullanalım.
