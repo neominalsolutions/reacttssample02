@@ -29,7 +29,7 @@ function PostsPage() {
         <tbody>
           {
               posts.map((post:Post) => {
-                return  <tr key={post.id}>
+                return <tr key={post.id}>
                   <td>
                     <Link to={`posts/${post.id}`}>{post.title}</Link>
                   </td>
