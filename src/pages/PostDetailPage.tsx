@@ -8,9 +8,7 @@ function PostDetailPage() {
   const param = useParams();
   console.log('param', param);
   const [post,setPost] = useState<Post>();
-
   // hooks kullanımı function componentin en başında tanımlanır.
-  
   useEffect(() => {
     loadData(Number(param.id)); // git param id değerine göre datayı load et
     return () => {}
