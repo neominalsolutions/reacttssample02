@@ -8,9 +8,18 @@ function App() {
   
   const routes:RouteObject[] = [
     {
-      path:'/posts',
-      Component:PostsPage
-    }
+      path:'',
+      element:<><Outlet /></>,
+      children: [
+        {
+          path:'/posts',
+          Component:PostsPage
+        },
+        {
+          path:'/posts/:id' // dynamic route
+        }
+      ]
+    },
   ] 
 
   // react-router-dom paketinde gelir.

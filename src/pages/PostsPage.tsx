@@ -1,6 +1,6 @@
 // postları yüklediğimiz component
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 
 // Backend deki Dto yapıları için burada karşılık olarak interface tercih edilir.
@@ -16,6 +16,21 @@ export interface Post {
 function PostsPage() {
 
   const [posts,setPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    console.log('component doma giriğinde');
+
+    // clean up function diyoruz. Component domdan ayrılırken çalışır.
+    return () => {
+      console.log('component domdan çıktığında')
+    }
+
+  }, []) // [] hali empty dependecy herhangi bir state mekanizmasını takip etmediğimiz kısım. sadece doma girerken 1 kereye mahsus çalışır
+
+  useEffect(() => {
+    console.log('posts state değiştiğinde');
+  }, [posts])
+
 
   return (
     <>
